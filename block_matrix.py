@@ -1,6 +1,6 @@
 """
 
-Author: Maximilian Krienitz, Laura Faustmann
+Author: Laura Faustmann
 Date: 28/11/2023
 """
 import matplotlib.pyplot as plt
