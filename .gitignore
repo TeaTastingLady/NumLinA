@@ -163,3 +163,5 @@ cython_debug/
 *_old.py
 test_*.py
 /reference_files/*
+!test_experiments_lu.py
+!test_linear_solvers.py

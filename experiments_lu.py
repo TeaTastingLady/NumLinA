@@ -1,8 +1,10 @@
-import numpy as np
 from typing import Callable
-from poisson_problem import error_plot, rhs
-from linear_solvers import solve_lu
+
+import numpy as np
+
 from block_matrix import BlockMatrix
+from linear_solvers import solve_lu
+from poisson_problem import error_plot, rhs
 
 N_LIST = list(range(2, 20))
 D_LIST = list(range(1,5))

@@ -3,10 +3,10 @@
 Author: Maximilian Krienitz, Laura Faustmann
 Date: 28/11/2023
 """
-from scipy.sparse import diags, bmat
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy.linalg import lu
+from scipy.sparse import bmat, diags
 
 
 class BlockMatrix:

@@ -1,5 +1,6 @@
 from scipy.linalg import solve_triangular
 
+
 def solve_lu(p, l, u, b):
     """Solves the linear system Ax = b via forward and backward substitution
     given the decomposition A = p * l * u.
