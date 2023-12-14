@@ -5,6 +5,7 @@ from poisson_problem import error_plot, rhs
 from linear_solvers import solve_lu
 from block_matrix import BlockMatrix
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 from linear_solvers import solve_lu
 
 N_LIST = list(range(2, 20))
@@ -105,6 +106,45 @@ def experiment_solution(n):
     plt.show()
 
 
+def experiment_solution2(n):
+    d = 2
+    u_vec, hat_u = get_solutions(n, d)
+    u_vec_mat = u_vec.reshape((n-1,n-1))
+    hat_u_mat = hat_u.reshape((n-1,n-1))
+
+    # Create x and y coordinates for u_vec_mat
+    x1 = np.arange(u_vec_mat.shape[1])
+    y1 = np.arange(u_vec_mat.shape[0])
+    x1, y1 = np.meshgrid(x1, y1)
+
+    # Create x and y coordinates for hat_u_mat
+    x2 = np.arange(hat_u_mat.shape[1])
+    y2 = np.arange(hat_u_mat.shape[0])
+    x2, y2 = np.meshgrid(x2, y2)
+
+    # Create a figure and a 3D axis
+    fig = plt.figure(figsize=(8, 6))
+
+
+    # Plot for u_vec_mat
+    ax1 = fig.add_subplot(121, projection='3d')  # 1 row, 2 columns, 1st subplot
+    ax1.plot_surface(x1, y1, u_vec_mat, cmap='viridis')
+    ax1.set_title('Exact solution')
+    ax1.set_xlabel('X Axis')
+    ax1.set_ylabel('Y Axis')
+    ax1.set_zlabel('Z Axis')
+
+    # Plot for matrix2
+    ax2 = fig.add_subplot(122, projection='3d')  # 1 row, 2 columns, 2nd subplot
+    ax2.plot_surface(x2, y2, hat_u_mat, cmap='plasma')
+    ax2.set_title('Approximation')
+    ax2.set_xlabel('X Axis')
+    ax2.set_ylabel('Y Axis')
+    ax2.set_zlabel('Z Axis')
+
+    # Show plot
+    plt.show()
+
 if __name__ == "__main__":
     #experiment_error([D_LIST], [[N_FIXED] * len(D_LIST)])
     # experiment_error([[1] * len(N_LIST), [2] * len(N_LIST), [3] * len(N_LIST)], [N_LIST] * 3)
@@ -120,3 +160,4 @@ if __name__ == "__main__":
     # b = rhs(2,4,f_func)
     # print(solve_lu(*mat, b))
     experiment_solution(20)
+    experiment_solution2(20)
