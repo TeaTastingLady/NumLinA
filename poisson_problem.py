@@ -157,6 +157,7 @@ def error_plot(d_list: list[list], n_list: list[list], hat_u_list: list[list], u
     plt.ylabel("error")
     if y_log_scale:
         plt.xscale("log")
+        plt.yscale("log")
     plt.legend()
     plt.tight_layout()
     plt.show()

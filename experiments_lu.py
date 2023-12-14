@@ -5,12 +5,13 @@ from poisson_problem import error_plot, rhs
 from linear_solvers import solve_lu
 from block_matrix import BlockMatrix
 import matplotlib.pyplot as plt
+from linear_solvers import solve_lu
 
 N_LIST = list(range(2, 20))
 D_LIST = list(range(1,5))
 N_FIXED = 5
 D_FIXED = 3
-KAPPA = 3
+KAPPA = 1.5
 
 def u_func(x: np.ndarray, kappa: int = KAPPA) -> float:
     d = len(x)
@@ -70,15 +71,40 @@ def experiment_condition(d_list,n_list):
     plt.xlabel("N values")
     plt.ylabel("matrix condition")
     plt.xscale("log")
+    plt.yscale("log")
     plt.tight_layout()
     plt.show()
 
+def get_solutions(n, d):
+    mat = BlockMatrix(d,n).get_lu()
+    b = rhs(d,n,f_func)
+    hat_u = solve_lu(*mat, b)
+    u_vec = rhs(d,n, u_func)
+    # print(f"b = {b}")
+    # print(f"A*u = {BlockMatrix(d,n).get_sparse().toarray().dot(u_vec)}")
+    # print(f"hat_u = {hat_u}")
+    # print(f"u_vec = {u_vec}")
+    return u_vec, hat_u
+
+def experiment_solution(n, d):
+    # reshape vectors to matrix (n-1) x (n-1)
+    # matrix to heatmap
+    u_vec, hat_u = get_solutions(n, d)
+
 if __name__ == "__main__":
     #experiment_error([D_LIST], [[N_FIXED] * len(D_LIST)])
-    #experiment_error([[1] * len(N_LIST), [2] * len(N_LIST), [3] * len(N_LIST)], [N_LIST] * 3)
+    # experiment_error([[1] * len(N_LIST), [2] * len(N_LIST), [3] * len(N_LIST)], [N_LIST] * 3)
     # print(matrix_condition(2,4))
     # print(matrix_condition(3,4))
     # print(matrix_condition(2,5))
     # print(matrix_condition(2,6))
-    # experiment_condition([1]*10,list(range(2,12)))
-    experiment_condition([1,2,3,4],[5,5,5,5])
+    #experiment_condition([1]*10,list(range(2,12)))
+    #experiment_condition([2]*10,list(range(2,12)))
+    #experiment_condition([3]*10,list(range(2,12)))
+    #experiment_condition([1,2,3,4],[5,5,5,5])
+    # mat = BlockMatrix(2,4).get_lu()
+    # b = rhs(2,4,f_func)
+    # print(solve_lu(*mat, b))
+    experiment_solution(3, 1)
+    experiment_solution(3, 2)
+    experiment_solution(3, 3)
