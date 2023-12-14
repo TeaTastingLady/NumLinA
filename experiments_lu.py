@@ -18,7 +18,7 @@ def u_func(x: np.ndarray, kappa: int = KAPPA) -> float:
     return np.prod([x[l] * np.sin(kappa * np.pi * x[l]) for l in range(d)])
 
 def term_1(x: float, kappa: int = KAPPA) -> float:
-    return 2 * kappa * np.pi * np.cos(kappa * np.pi * x) - kappa**2 * np.pi**2 * x * np.sin(kappa * np.pi * x)
+    return -2 * kappa * np.pi * np.cos(kappa * np.pi * x) + kappa**2 * np.pi**2 * x * np.sin(kappa * np.pi * x)
     
 def f_func(x: np.ndarray) -> float:
     sum = 0
@@ -86,10 +86,24 @@ def get_solutions(n, d):
     # print(f"u_vec = {u_vec}")
     return u_vec, hat_u
 
-def experiment_solution(n, d):
+def experiment_solution(n):
     # reshape vectors to matrix (n-1) x (n-1)
     # matrix to heatmap
+    d = 2
     u_vec, hat_u = get_solutions(n, d)
+    u_vec_mat = u_vec.reshape((n-1, n-1))
+    hat_u_mat = hat_u.reshape((n-1, n-1))
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+    im1 = ax1.imshow(u_vec_mat, cmap='viridis', interpolation='nearest')
+    ax1.set_title('Exact solution')
+    fig.colorbar(im1, ax=ax1, orientation='vertical')
+    im2 = ax2.imshow(hat_u_mat, cmap='plasma', interpolation='nearest')
+    ax2.set_title('Approximation')
+    fig.colorbar(im2, ax=ax2, orientation='vertical')
+
+    plt.show()
+
 
 if __name__ == "__main__":
     #experiment_error([D_LIST], [[N_FIXED] * len(D_LIST)])
@@ -105,6 +119,4 @@ if __name__ == "__main__":
     # mat = BlockMatrix(2,4).get_lu()
     # b = rhs(2,4,f_func)
     # print(solve_lu(*mat, b))
-    experiment_solution(3, 1)
-    experiment_solution(3, 2)
-    experiment_solution(3, 3)
+    experiment_solution(20)
