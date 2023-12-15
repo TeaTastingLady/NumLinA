@@ -1,17 +1,13 @@
+from time import time
+
+import matplotlib.pyplot as plt
 import numpy as np
 from numpy import linalg as LA
-from typing import Callable
-from poisson_problem import error_plot, rhs
-from linear_solvers import solve_lu
-from block_matrix import BlockMatrix
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from linear_solvers import solve_lu
 
-N_LIST = list(range(2, 20))
-D_LIST = list(range(1,5))
-N_FIXED = 5
-D_FIXED = 3
+from block_matrix import BlockMatrix
+from linear_solvers import solve_lu
+from poisson_problem import compute_error, error_plot, rhs
+
 KAPPA = 1.5
 
 def u_func(x: np.ndarray, kappa: int = KAPPA) -> float:
@@ -36,43 +32,58 @@ def matrix_condition(d: int, n: int) -> float:
     A = BlockMatrix(d,n).get_sparse().toarray()
     return LA.cond(A)
 
-def experiment_error(d_list: list[list], n_list: list[list], y_log_scale: bool = True):
-    hat_u_list_total = []
-    for set_idx in range(len(d_list)):
-        hat_u_list = []
-        for idx in range(len(d_list[set_idx])):
-            b = rhs(d_list[set_idx][idx], n_list[set_idx][idx], f_func)
+def experiment_error(n_list: list[list]):
+    start_experiment = time() # stop time for calculations
+
+    error_values_list = []
+    for d in range(1,4):
+        error_values = []
+        for n in n_list[d-1]:
+            b = rhs(d, n, f_func)
             # print(f"{idx+1} b calculated")
-            mat = BlockMatrix(d_list[set_idx][idx], n_list[set_idx][idx])
+            mat = BlockMatrix(d, n)
             # print(f"{idx+1} mat calculated")
             p, l, u = mat.get_lu()
             # print(f"{idx+1} plu calculated")
             hat_u = solve_lu(p, l, u, b)
             # print(f"{idx+1} hat_u calculated")
-            hat_u_list.append(hat_u)
-        hat_u_list_total.append(hat_u_list)
-        print(f"completed set {set_idx + 1}")
+            error_values.append(compute_error(d, n, hat_u, u_func))
 
-    error_plot(d_list, n_list, hat_u_list_total, u_func, y_log_scale=y_log_scale)
+        error_values_list.append(error_values)
+        print(f"completed dimension set {d}")
+    
+    end_experiment = time() # stop time for calculations
+    print(f"error experiment calculation time: {end_experiment-start_experiment}s")
 
-def experiment_condition(d_list,n_list):
-    cond_values = [matrix_condition(d_list[idx], n_list[idx]) for idx in range(len(d_list))]
-    print(cond_values)
-    N_values = [(n_list[idx] - 1) ** d_list[idx] for idx in range(len(d_list))]
-    print(N_values)
-    plt.plot(
-        N_values,
-        cond_values,
-        marker="o",
-        linestyle="-",
-        markersize=4,
-        color="red",
-    )
+    error_plot(n_list, error_values_list)
+
+def experiment_condition(n_list: list[list]):
+    start_experiment = time() # stop time for calculations
+
+    plot_colors = ["blue", "green", "red", "magenta", "cyan"]
+    for d in range(1, 4):
+        cond_values = [matrix_condition(d, n_list[d-1][idx]) for idx in range(len(n_list[d-1]))]
+        N_values = [(n_list[d-1][idx] - 1) ** d for idx in range(len(n_list[d-1]))]
+        plt.plot(
+            N_values,
+            cond_values,
+            marker="o",
+            linestyle="-",
+            markersize=4,
+            color=plot_colors[d-1],
+            label=f"Dimension {d}",
+        )
+        print(f"completed dimension set {d}")
+
+    end_experiment = time() # stop time for calculations
+    print(f"condition experiment calculation time: {end_experiment-start_experiment}s")
+
     plt.title("matrix condition")
-    plt.xlabel("N values")
+    plt.xlabel("N values depending on n for fixed dimensions")
     plt.ylabel("matrix condition")
     plt.xscale("log")
     plt.yscale("log")
+    plt.legend()
     plt.tight_layout()
     plt.show()
 
@@ -87,7 +98,7 @@ def get_solutions(n, d):
     # print(f"u_vec = {u_vec}")
     return u_vec, hat_u
 
-def experiment_solution(n):
+def experiment_solution_heatmap(n):
     # reshape vectors to matrix (n-1) x (n-1)
     # matrix to heatmap
     d = 2
@@ -106,7 +117,7 @@ def experiment_solution(n):
     plt.show()
 
 
-def experiment_solution2(n):
+def experiment_solution_plot(n):
     d = 2
     u_vec, hat_u = get_solutions(n, d)
     u_vec_mat = u_vec.reshape((n-1,n-1))
@@ -146,18 +157,33 @@ def experiment_solution2(n):
     plt.show()
 
 if __name__ == "__main__":
-    #experiment_error([D_LIST], [[N_FIXED] * len(D_LIST)])
-    # experiment_error([[1] * len(N_LIST), [2] * len(N_LIST), [3] * len(N_LIST)], [N_LIST] * 3)
-    # print(matrix_condition(2,4))
-    # print(matrix_condition(3,4))
-    # print(matrix_condition(2,5))
-    # print(matrix_condition(2,6))
-    #experiment_condition([1]*10,list(range(2,12)))
-    #experiment_condition([2]*10,list(range(2,12)))
-    #experiment_condition([3]*10,list(range(2,12)))
-    #experiment_condition([1,2,3,4],[5,5,5,5])
-    # mat = BlockMatrix(2,4).get_lu()
-    # b = rhs(2,4,f_func)
-    # print(solve_lu(*mat, b))
-    experiment_solution(20)
-    experiment_solution2(20)
+    # n values for dimension 1 to 3
+    MAX_N3_error = 22 # max value for dimension 3 and automatically adjusting lists for dimension 1 and 2
+    N_LIST1_error = list(range(2, MAX_N3_error)) + list(np.unique(np.round(np.logspace(np.log10(MAX_N3_error),np.log10(MAX_N3_error**3), num=6)).astype(int)))[1:]
+    print(f"N_LIST1_error: {N_LIST1_error}")
+    N_LIST2_error = list(range(2, MAX_N3_error)) + list(np.unique(np.round(np.logspace(np.log10(MAX_N3_error),np.log10(np.sqrt(MAX_N3_error**3)), num=6)).astype(int)))[1:]
+    print(f"N_LIST2_error: {N_LIST2_error}")
+    N_LIST3_error = list(range(2, MAX_N3_error))
+    print(f"N_LIST3_error: {N_LIST3_error}")
+
+    # error plot
+    experiment_error([N_LIST1_error, N_LIST2_error, N_LIST3_error])
+
+    # n values for dimension 1 to 3
+    MAX_N3_condition = 16 # max value for dimension 3 and automatically adjusting lists for dimension 1 and 2
+    N_LIST1_condition = list(range(2, MAX_N3_condition)) + list(np.unique(np.round(np.logspace(np.log10(MAX_N3_condition),np.log10(MAX_N3_condition**3), num=6)).astype(int)))[1:]
+    print(f"N_LIST1_condition: {N_LIST1_condition}")
+    N_LIST2_condition = list(range(2, MAX_N3_condition)) + list(np.unique(np.round(np.logspace(np.log10(MAX_N3_condition),np.log10(np.sqrt(MAX_N3_condition**3)), num=6)).astype(int)))[1:]
+    print(f"N_LIST2_condition: {N_LIST2_condition}")
+    N_LIST3_condition = list(range(2, MAX_N3_condition))
+    print(f"N_LIST3_condition: {N_LIST3_condition}")
+
+    # condition plot
+    # Note: Die Dimension 1 muss am schnellsten steigen, da immer gilt,
+    # dass für das gleich n und d beliebig die Kondition fast gleich ist.
+    # Da wir jedoch auf der x-Achse N haben, steigt die Kondition bei d=1 am schnellsten.
+    experiment_condition([N_LIST1_condition, N_LIST2_condition, N_LIST3_condition])
+
+    # solution plots
+    experiment_solution_plot(20)
+    experiment_solution_heatmap(20)

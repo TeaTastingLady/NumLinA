@@ -3,8 +3,8 @@
 Author: Laura Faustmann
 Date: 28/11/2023
 """
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def rhs(d, n, f): # pylint: disable=invalid-name
@@ -118,46 +118,40 @@ def compute_error(d, n, hat_u, u): # pylint: disable=invalid-name, unused-argume
     u_vec = rhs(d,n,u)
     return np.max(np.abs(u_vec - hat_u))
 
-def error_plot(d_list: list[list], n_list: list[list], hat_u_list: list[list], u, y_log_scale: bool):
+def error_plot(n_list: list[list], error_values_list: list[list]):
     """Plots the error of the discrete solution hat_u compared
     to the exact solution u dependent on n and d.
 
     Parameters
     ----------
-    d_list: list
-    list of dimensions
-    n_list: list
-    list of number of partial intervals
-    hat_u_list: list
-    discrete solution
-    u: callable
-    exact solution
+    n_list: list[list]
+        list of n value sets of different dimensions
+    error_values_list: list[list]
+        list of error value sets of different dimensions
 
     Return
     ------
     shows plot
     """
     plot_colors = ["blue", "green", "red", "magenta", "cyan"]
-    for set_idx in range(len(d_list)):
-        error_values = [compute_error(d_list[set_idx][idx], n_list[set_idx][idx], hat_u_list[set_idx][idx], u) for idx in range(len(d_list[set_idx]))]
-        N_values = [(n_list[set_idx][idx] - 1) ** d_list[set_idx][idx] for idx in range(len(d_list[set_idx]))]
+    for d in range(1,4):
+        N_values = [(n_list[d-1][idx] - 1) ** d for idx in range(len(n_list[d-1]))]
         plt.plot(
             N_values,
-            error_values,
+            error_values_list[d-1],
             marker="o",
             linestyle="-",
             markersize=4,
-            color=plot_colors[set_idx],
-            label=f"plot {set_idx + 1}"
+            color=plot_colors[d-1],
+            label=f"Dimension {d}",
         )
 
     plt.title(f"error depending on N")
 
-    plt.xlabel("N values")
+    plt.xlabel("N values depending on n for fixed dimensions")
     plt.ylabel("error")
-    if y_log_scale:
-        plt.xscale("log")
-        plt.yscale("log")
+    plt.xscale("log")
+    plt.yscale("log")
     plt.legend()
     plt.tight_layout()
     plt.show()
