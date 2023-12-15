@@ -40,6 +40,39 @@ def rhs(d, n, f): # pylint: disable=invalid-name
 
     return b
 
+def func_to_vec(d, n, f): # pylint: disable=invalid-name
+    """Computes the vector `b` for a given function `f`.
+
+    Parameters
+    ----------
+    d : int
+        Dimension of the space.
+    n : int
+        Number of intervals in each dimension.
+    f : callable
+        Function right-hand-side of Poisson problem. The calling signature is
+        `f(x)`. Here `x` is an array_like of `numpy`. The return value
+        is a scalar.
+
+    Returns
+    -------
+    numpy.ndarray
+        Vector to the right-hand-side f.
+
+    Raises
+    ------
+    ValueError
+        If d < 1 or n < 2.
+    """
+    if d < 1 or n < 2:
+        raise ValueError(
+            f"there was a wrong input parameter: d > 0 (BUT: {d} > 0) or n > 1 (BUT: {n} > 1)"
+        )
+
+    b = np.array([f([coord * 1/n for coord in inv_idx(m, d, n)]) for m in range(1, (n - 1) ** d + 1)]) # pylint: disable=invalid-name
+
+    return b
+
 
 def idx(nx, n): # pylint: disable=invalid-name
     """Calculates the number of an equation in the Poisson problem for
@@ -115,7 +148,7 @@ def compute_error(d, n, hat_u, u): # pylint: disable=invalid-name, unused-argume
     float
         maximal absolute error at the discretization points
     """
-    u_vec = rhs(d,n,u)
+    u_vec = func_to_vec(d,n,u)
     return np.max(np.abs(u_vec - hat_u))
 
 def error_plot(n_list: list[list], error_values_list: list[list]):

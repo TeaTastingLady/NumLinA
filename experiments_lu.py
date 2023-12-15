@@ -6,9 +6,9 @@ from numpy import linalg as LA
 
 from block_matrix import BlockMatrix
 from linear_solvers import solve_lu
-from poisson_problem import compute_error, error_plot, rhs
+from poisson_problem import compute_error, error_plot, func_to_vec, rhs
 
-KAPPA = 1.5
+KAPPA = 1
 
 def u_func(x: np.ndarray, kappa: int = KAPPA) -> float:
     d = len(x)
@@ -88,12 +88,12 @@ def experiment_condition(n_list: list[list]):
     plt.show()
 
 def get_solutions(n, d):
-    mat = BlockMatrix(d,n).get_lu()
+    mat = BlockMatrix(d,n)
     b = rhs(d,n,f_func)
-    hat_u = solve_lu(*mat, b)
-    u_vec = rhs(d,n, u_func)
+    hat_u = solve_lu(*mat.get_lu(), b)
+    u_vec = func_to_vec(d,n, u_func)
     # print(f"b = {b}")
-    # print(f"A*u = {BlockMatrix(d,n).get_sparse().toarray().dot(u_vec)}")
+    # print(f"A*u = {mat.get_sparse().toarray().dot(u_vec)}")
     # print(f"hat_u = {hat_u}")
     # print(f"u_vec = {u_vec}")
     return u_vec, hat_u
