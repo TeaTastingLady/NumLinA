@@ -1,7 +1,6 @@
 """
-
-Author: Laura Faustmann
-Date: 28/11/2023
+Author: Karla Menze, Laura Faustmann
+Date: 20/12/2023
 """
 import matplotlib.pyplot as plt
 import numpy as np
@@ -33,13 +32,13 @@ class BlockMatrix:
         If d < 1 or n < 2.
     """
 
-    def __init__(self, d, n): # pylint: disable=invalid-name
+    def __init__(self, d, n):  # pylint: disable=invalid-name
         if d < 1 or n < 2:
             raise ValueError(
                 f"there was a wrong input parameter: d > 0 (BUT: {d} > 0) or n > 1 (BUT: {n} > 1)"
             )
-        self.d = d # pylint: disable=invalid-name
-        self.n = n # pylint: disable=invalid-name
+        self.d = d  # pylint: disable=invalid-name
+        self.n = n  # pylint: disable=invalid-name
 
     def get_sparse(self):
         """Returns the block matrix as sparse matrix.
@@ -51,9 +50,11 @@ class BlockMatrix:
         """
         diagonals = np.full(self.n - 1, 2 * self.d)
         off_diagonals = np.full(self.n - 2, -1)
-        A = diags([diagonals, off_diagonals, off_diagonals], [0, -1, 1], format="csr") # pylint: disable=invalid-name
+        A = diags( # pylint: disable=invalid-name
+            [diagonals, off_diagonals, off_diagonals], [0, -1, 1], format="csr"
+        )
 
-        for l in range(2, self.d + 1): # pylint: disable=invalid-name
+        for l in range(2, self.d + 1):  # pylint: disable=invalid-name
             identity = -np.eye((self.n - 1) ** (l - 1))
             block_rows = []
             for i in range(self.n - 1):
@@ -66,7 +67,7 @@ class BlockMatrix:
                     else:
                         block_row.append(None)
                 block_rows.append(block_row)
-            A = bmat(block_rows, format="csr") # pylint: disable=invalid-name
+            A = bmat(block_rows, format="csr")  # pylint: disable=invalid-name
 
         return A
 
@@ -82,7 +83,7 @@ class BlockMatrix:
         float
             Relative number of non-zeros
         """
-        A = self.get_sparse() # pylint: disable=invalid-name
+        A = self.get_sparse()  # pylint: disable=invalid-name
         non_zero = A.count_nonzero()
         return non_zero, non_zero / (self.n - 1) ** (2 * self.d)
 
@@ -99,7 +100,7 @@ class BlockMatrix:
         u : numpy.ndarray0
             upper triangular matrix of LU-decomposition
         """
-        A = self.get_sparse()
+        A = self.get_sparse() # pylint: disable=invalid-name
         return lu(A.toarray())
 
     def eval_sparsity_lu(self):
@@ -114,14 +115,14 @@ class BlockMatrix:
         float
             Relative number of non-zeros
         """
-        _,l,u = self.get_lu()
+        _, l, u = self.get_lu() # pylint: disable=invalid-name, unbalanced-tuple-unpacking
         nnz_l = np.count_nonzero(l)
         nnz_u = np.count_nonzero(u)
-        nnz_lu = nnz_l + nnz_u - len(l) # minus ones on diagonal of l
+        nnz_lu = nnz_l + nnz_u - len(l)  # minus ones on diagonal of l
         return nnz_lu, nnz_lu / (self.n - 1) ** (2 * self.d)
 
 
-def nz_plots_n(d, n_list): # pylint: disable=invalid-name
+def nz_plots_n(d, n_list):  # pylint: disable=invalid-name
     """Plots the storage requirement of the sparse Matrix A^d and a
     full populated Matrix depending on n.
     Parameters
@@ -162,7 +163,7 @@ def nz_plots_n(d, n_list): # pylint: disable=invalid-name
     plt.show()
 
 
-def nz_plots_d(n, d_list): # pylint: disable=invalid-name
+def nz_plots_d(n, d_list):  # pylint: disable=invalid-name
     """Plots the storage requirement of the sparse Matrix A^d
     and a full populated Matrix depending on d.
     Parameters
@@ -203,7 +204,8 @@ def nz_plots_d(n, d_list): # pylint: disable=invalid-name
     plt.tight_layout()
     plt.show()
 
-def nz_plots_N(N_list): # pylint: disable=invalid-name
+
+def nz_plots_N(N_list):  # pylint: disable=invalid-name
     """Plots the storage requirement of the sparse Matrix A^d
     and a full populated Matrix depending on N.
     Parameters
@@ -240,7 +242,8 @@ def nz_plots_N(N_list): # pylint: disable=invalid-name
     plt.tight_layout()
     plt.show()
 
-def nz_plots_A_lu(d, n_list): # pylint: disable=invalid-name
+
+def nz_plots_A_lu(d, n_list):  # pylint: disable=invalid-name
     """Plots the storage requirement of the sparse Matrix A^d and a
     full populated Matrix depending on n.
     Parameters
@@ -254,8 +257,8 @@ def nz_plots_A_lu(d, n_list): # pylint: disable=invalid-name
     callable
     """
     nz_values_lu = [BlockMatrix(d, n).eval_sparsity_lu()[0] for n in n_list]
-    nz_values_A = [BlockMatrix(d, n).eval_sparsity()[0] for n in n_list]
-    N_values = [(n - 1) ** d for n in n_list]
+    nz_values_A = [BlockMatrix(d, n).eval_sparsity()[0] for n in n_list] # pylint: disable=invalid-name
+    N_values = [(n - 1) ** d for n in n_list] # pylint: disable=invalid-name
     plt.plot(
         N_values,
         nz_values_lu,
@@ -284,8 +287,8 @@ def nz_plots_A_lu(d, n_list): # pylint: disable=invalid-name
 
 def main():
     """main function"""
-    n = 3 # pylint: disable=invalid-name
-    d = 3 # pylint: disable=invalid-name
+    n = 3  # pylint: disable=invalid-name
+    d = 3  # pylint: disable=invalid-name
     mat = BlockMatrix(d, n)
     print(f"A_d matrix for n={n} and d={d}:")
     print(mat.get_sparse().toarray())
