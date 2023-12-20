@@ -3,6 +3,11 @@ from time import time
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy import linalg as LA
+from poisson_problem import error_plot, rhs
+from linear_solvers import solve_lu
+from block_matrix import BlockMatrix, nz_plots_A_lu
+import matplotlib.pyplot as plt
+from linear_solvers import solve_lu
 
 from block_matrix import BlockMatrix
 from linear_solvers import solve_lu
@@ -187,3 +192,6 @@ if __name__ == "__main__":
     # solution plots
     experiment_solution_plot(20)
     experiment_solution_heatmap(20)
+
+    # sparsity plot
+    nz_plots_A_lu(2, list(range(2,20)))
