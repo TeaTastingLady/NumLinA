@@ -178,7 +178,7 @@ class FiniteDifference:
 def error_plot(
     func_list, h_list, error_parameter, title="", h_line_on=True
 ):  # pylint: disable=invalid-name
-    """Plots error of the approximation of the first and second derivative for a given collection of step sizes. 
+    """Plots error of the approximation of the first and second derivative for a given collection of step sizes.
     Parameters
     ----------
     func_list: list

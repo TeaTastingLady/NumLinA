@@ -1,7 +1,11 @@
+"""
+Author: Karla Menze, Laura Faustmann
+Date: 20/12/2023
+"""
 from scipy.linalg import solve_triangular
 
 
-def solve_lu(p, l, u, b):
+def solve_lu(p, l, u, b): # pylint: disable=invalid-name
     """Solves the linear system Ax = b via forward and backward substitution
     given the decomposition A = p * l * u.
 
@@ -22,12 +26,12 @@ def solve_lu(p, l, u, b):
         solution of the linear system
     """
     b_permutated = p.dot(b)
-    c = solve_triangular(l, b_permutated, lower=True)
-    x = solve_triangular(u, c, lower=False)
-    return x
+    c_vec = solve_triangular(l, b_permutated, lower=True)
+    x_vec = solve_triangular(u, c_vec, lower=False)
+    return x_vec
 
 
-def solve_sor(A, b, x0, params=dict(eps=1e-8, max_iter=1000, var_x=1e-4), omega=1.5):
+def solve_sor(A, b, x0, params={"eps":1e-8, "max_iter":1000, "var_x":1e-4}, omega=1.5): # pylint: disable=invalid-name, unused-argument, dangerous-default-value
     """Solves the linear system Ax = b via the successive over relaxation method.
 
     Parameters
@@ -70,7 +74,7 @@ def solve_sor(A, b, x0, params=dict(eps=1e-8, max_iter=1000, var_x=1e-4), omega=
     """
 
 
-def solve_gs(A, b, x0, params=dict(eps=1e-8, max_iter=1000, var_x=1e-4)):
+def solve_gs(A, b, x0, params={"eps":1e-8, "max_iter":1000, "var_x":1e-4}): # pylint: disable=invalid-name, unused-argument, dangerous-default-value
     """Solves the linear system Ax = b via the Jacobi method.
 
     Parameters
@@ -111,7 +115,7 @@ def solve_gs(A, b, x0, params=dict(eps=1e-8, max_iter=1000, var_x=1e-4)):
     """
 
 
-def solve_es(A, b, x0, params=dict(eps=1e-8, max_iter=1000, var_x=1e-4)):
+def solve_es(A, b, x0, params={"eps":1e-8, "max_iter":1000, "var_x":1e-4}): # pylint: disable=invalid-name, unused-argument, dangerous-default-value
     """Solves the linear system Ax = b via the Gauss-Seidel method.
 
     Parameters
@@ -152,7 +156,7 @@ def solve_es(A, b, x0, params=dict(eps=1e-8, max_iter=1000, var_x=1e-4)):
     """
 
 
-def solve_cg(A, b, x0, params=dict(eps=1e-8, max_iter=1000, var_x=1e-4)):
+def solve_cg(A, b, x0, params={"eps":1e-8, "max_iter":1000, "var_x":1e-4}): # pylint: disable=invalid-name, unused-argument, dangerous-default-value
     """Solves the linear system Ax = b via the conjugated gradient method.
 
     Parameters

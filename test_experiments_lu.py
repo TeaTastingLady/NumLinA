@@ -9,14 +9,19 @@ from experiments_lu import f_func, u_func
 from linear_solvers import solve_lu
 from poisson_problem import compute_error, rhs
 
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
+
 
 def u_func2(x):
     return sum([xl**3 for xl in x])
 
+
 def f_func2(x):
-    return sum([6*xl for xl in x])
+    return sum([6 * xl for xl in x])
+
 
 N_LIST2 = [2, 4]
 D_LIST2 = [1, 1]
@@ -41,6 +46,7 @@ ERROR_LIST2 = [0.34375, 0.3671875]
 #     error = compute_error(d, n, hat_u, u)
 #     logger.debug(f"error = {error}")
 
+
 def approximate_laplacian(u, x, h=1e-5):
     d = len(x)
     laplacian = 0
@@ -49,8 +55,9 @@ def approximate_laplacian(u, x, h=1e-5):
         x_plus_h[i] += h
         x_minus_h = np.copy(x)
         x_minus_h[i] -= h
-        laplacian += (u(x_plus_h) - 2*u(x) + u(x_minus_h)) / h**2
+        laplacian += (u(x_plus_h) - 2 * u(x) + u(x_minus_h)) / h**2
     return laplacian
+
 
 def test_poisson_solution():
     test_points = [np.random.rand(3) for _ in range(10)]  # Generate random test points
