@@ -17,7 +17,7 @@ from block_matrix import BlockMatrix
 from linear_solvers import solve_lu
 from poisson_problem import compute_error, error_plot, func_to_vec, rhs
 
-KAPPA = 1
+KAPPA = 7
 
 
 def u_func(x: np.ndarray, kappa: int = KAPPA) -> float:  # pylint: disable=invalid-name
@@ -308,7 +308,7 @@ def main():
     # max value for dimension 3 and
     # automatically adjusting lists
     # for dimension 1 and 2 (~15 min)
-    MAX_N3_error = 30 # pylint: disable=invalid-name
+    MAX_N3_error = 10 # pylint: disable=invalid-name
     N_LIST1_error = ( # pylint: disable=invalid-name
         list(range(2, MAX_N3_error))
         + list(
@@ -393,3 +393,14 @@ def main():
 
     # sparsity plot
     nz_plots_A_lu(2, list(range(2,20)))
+
+if __name__ == "__main__":
+    #main()
+    # experiment_solution_plot(2)
+    #experiment_solution_plot(3)
+    #experiment_solution_plot(4)
+    #experiment_solution_plot(5)
+    experiment_solution_plot(6)
+    experiment_solution_plot(7)
+    experiment_solution_plot(8)
+    # experiment_solution_plot(9)
