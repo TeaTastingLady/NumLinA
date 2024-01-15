@@ -14,8 +14,14 @@ def make_A(data: np.ndarray) -> np.ndarray:
     A_mat = np.column_stack((col_1, col_2, col_3, col_4, col_5))
     return A_mat
 
-def read_data(path: str) -> tuple[np.ndarray, np.ndarray]:
+def read_data(path: str, collection: list = None) -> tuple[np.ndarray, np.ndarray]:
     data = np.genfromtxt(path, delimiter=",")
+    if collection is not None:
+        if max(collection) >= len(data):
+            raise ValueError(f"In collection is at least one element out of bounds (length of data: {len(data)}).")
+        if len(collection) < 5:
+            raise ValueError("Collection needs at least 5 elements.")
+        data = data[collection]
     print("### Daten ###")
     print(data)
     b_vec = make_b(data)
@@ -60,7 +66,7 @@ if __name__ == "__main__":
         print(f"### file {letter} ###")
         print("#####################")
         print()
-        A_mat, b_vec = read_data(f"qr_data/ellipse_{letter}.txt")
+        A_mat, b_vec = read_data(f"qr_data/ellipse_{letter}.txt", collection=None)
         print("### A Matrix ###")
         print(A_mat)
         print("### b Vektor ###")
@@ -82,6 +88,5 @@ if __name__ == "__main__":
         print(A_cond)
         print("### Kondition von AtA ###")
         print(AtA_cond)
-
 
 
