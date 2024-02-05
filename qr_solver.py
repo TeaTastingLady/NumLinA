@@ -153,42 +153,6 @@ def compare_cond(
     return LA.cond(A_mat), LA.cond(np.matmul(np.transpose(A_mat), A_mat))
 
 
-def plot_sol(
-    x_vec: np.ndarray, path, collection
-):  # pylint: disable=redefined-outer-name
-    """Plots the solution.
-    Parameters
-    ----------
-    x_vec: np.ndarray
-    path: string
-    collection: list
-    Return
-    ------
-    callable
-    """
-    a, b, c, d, e = x_vec  # pylint: disable=invalid-name
-    # TODO: Grenzen von Daten abhängig wählen!
-    # for now use the first entry of the data collection
-    x_points, y_points = np.genfromtxt(path, delimiter=",", unpack=True)
-    x_data = np.linspace(x_points[0] - 1, x_points[0] + 5)
-    y_data = np.linspace(y_points[0] - 5, y_points[0] + 1)
-
-    x_data, y_data = np.meshgrid(x_data, y_data)
-    function = (
-        -(x_data**2)
-        + a * y_data**2
-        + b * x_data * y_data
-        + c * x_data
-        + d * y_data
-        + e
-    )
-
-    plt.contour(x_data, y_data, function, [0])
-    plt.scatter(x_points, y_points, linewidth=0.2)
-
-    plt.show()
-
-
 def plot_ellipsis(
     data_none: np.ndarray,  # pylint: disable=redefined-outer-name
     x_vec: np.ndarray,  # pylint: disable=redefined-outer-name
@@ -279,85 +243,6 @@ def plot_ellipsis(
     # we should also look at the points more closely, how far are they off? (for c_coeff, d_coeff)
 
 
-def plot_cond_bar(A_mat_conds: list):  # pylint: disable=invalid-name, redefined-outer-name
-    """Plots the condition of A and AtA depending on the number of datapoints as bar plot.
-    Parameters
-    ----------
-    A_mat: np.ndarray
-    A matrix
-    Return
-    ------
-    callable
-    """
-    # Transpose the data to separate columns
-    columns = list(zip(*A_mat_conds))
-
-    # Number of bars
-    num_bars = len(columns)
-
-    # Improved plot aesthetics
-    plt.style.use("seaborn-v0_8-darkgrid")
-
-    # New figure and axes
-    _, ax = plt.subplots(figsize=(12, 8))  # pylint: disable=invalid-name
-
-    # Bar width and spacing
-    bar_width = 0.2
-    group_spacing = 0.5
-
-    # Calculate new indices with spacing for each group
-    new_indices = []
-    base = 0
-    for _ in range(len(A_mat_conds)):
-        group_indices = [base + j * bar_width for j in range(num_bars)]
-        new_indices.append(group_indices)
-        base += num_bars * bar_width + group_spacing
-
-    # Colors for the bars
-    colors = [
-        "skyblue",
-        "steelblue",
-        "lightgreen",
-        "forestgreen",
-        "lightcoral",
-        "darkred",
-    ]
-
-    col_names = ["all", "selected", "rounded"]
-    example_names = ["a", "c", "d"]
-    # Plotting each pair of columns with connections
-    for i in range(0, num_bars, 2):
-        for j in range(len(A_mat_conds)):
-            ax.bar(
-                new_indices[j][i],
-                columns[i][j],
-                bar_width,
-                color=colors[i],
-                label=f"A cond ({col_names[i//2]})" if j == 0 else "",
-            )
-            ax.bar(
-                new_indices[j][i + 1],
-                columns[i + 1][j],
-                bar_width,
-                color=colors[i + 1],
-                label=f"AtA cond ({col_names[i//2]})" if j == 0 else "",
-            )
-
-    # Enhancing the plot with labels, title, and legend
-    ax.set_xlabel("Examples", fontsize=20)
-    ax.set_ylabel("Kondition", fontsize=20)
-    ax.set_title("Konditionen für unterschiedliche Daten", fontsize=22)
-    ax.set_xticks([np.mean(ni) for ni in new_indices])
-    ax.set_xticklabels([f"Example {i}" for i in example_names])
-    ax.legend(fontsize=18)
-
-    # Using log scale for y-axis
-    plt.yscale("log")
-
-    # Show the plot
-    plt.show()
-
-
 def plot_cond_line(A_mat: np.ndarray):  # pylint: disable=invalid-name, redefined-outer-name
     """Plots the condition of A and AtA depending on the number of datapoints as line plot.
     Parameters
@@ -370,6 +255,8 @@ def plot_cond_line(A_mat: np.ndarray):  # pylint: disable=invalid-name, redefine
     """
     A_row_num = len(A_mat)  # pylint: disable=invalid-name
     x_values = list(range(5, A_row_num + 1))
+    y_values_linear = [x for x in x_values]
+    y_values_quadratic = [x**2 for x in x_values]
     y_values_A = []  # pylint: disable=invalid-name
     y_values_ATA = []  # pylint: disable=invalid-name
     for x in x_values:  # pylint: disable=invalid-name
@@ -381,10 +268,28 @@ def plot_cond_line(A_mat: np.ndarray):  # pylint: disable=invalid-name, redefine
 
     plt.plot(
         x_values,
+        y_values_linear,
+        linestyle="-",
+        markersize=2,
+        color="black",
+        label="linear",
+    )
+
+    plt.plot(
+        x_values,
+        y_values_quadratic,
+        linestyle="-",
+        markersize=2,
+        color="gray",
+        label="quadratic",
+    )
+
+    plt.plot(
+        x_values,
         y_values_A,
         marker="o",
         linestyle="-",
-        markersize=4,
+        markersize=3,
         color="blue",
         label="A",
     )
@@ -393,16 +298,19 @@ def plot_cond_line(A_mat: np.ndarray):  # pylint: disable=invalid-name, redefine
         y_values_ATA,
         marker="o",
         linestyle="-",
-        markersize=4,
+        markersize=3,
         color="red",
         label="AtA",
     )
     plt.title("Kondition von A und AtA in Abhängigkeit der Datenpunktanzahl")
     plt.xlabel("Datenpunktanzahl")
     plt.ylabel("Kondition")
+    plt.xscale("log")
     plt.yscale("log")
     plt.legend()
     plt.tight_layout()
+    plt.xticks(minor=True)
+    plt.grid(True)
     plt.show()
 
 
